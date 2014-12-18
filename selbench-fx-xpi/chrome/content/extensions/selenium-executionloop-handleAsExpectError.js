@@ -40,7 +40,7 @@
             // was an unexpected error
             $$.LOG.error("Expected the error: " + $$.expectedError);
             $$.LOG.error(e.message);
-            isHandled = this.commandError(msg);
+            isHandled = false;
           }
         }
         finally {
@@ -48,6 +48,7 @@
         }
       }
       if (!isHandled) {
+           //TODO: mark the current command as failed
            this.testComplete();
       } else {
            this.continueTest();
