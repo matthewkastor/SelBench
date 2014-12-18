@@ -34,13 +34,14 @@
           if (isErrorMatch(e)) {
             // was an expected error
             $$.LOG.debug("Expected error confirmed: " + e.message);
+           //TODO: mark the current command as passed
             isHandled = true;
           }
           else {
             // was an unexpected error
             $$.LOG.error("Expected the error: " + $$.expectedError);
             $$.LOG.error(e.message);
-            isHandled = false;
+            this._handleCommandError(new Error(e.message));
           }
         }
         finally {
@@ -48,7 +49,6 @@
         }
       }
       if (!isHandled) {
-           //TODO: mark the current command as failed
            this.testComplete();
       } else {
            this.continueTest();
