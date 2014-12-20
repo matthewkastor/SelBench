@@ -22,8 +22,18 @@
 function $w() { return selenium.browserbot.getCurrentWindow(); }
 function $d() { return selenium.browserbot.getDocument(); }
 
+var globalContext = this;
 // selbench name-space
 (function($$){
+  if(globalContext.onServer === true) {
+    globalContext.testCase = {};
+    HtmlRunnerTestLoop.prototype.old_initialize = HtmlRunnerTestLoop.prototype.initialize;
+    HtmlRunnerTestLoop.prototype.initialize = function (htmlTestCase, metrics, seleniumCommandFactory) {
+      LOG.info("SelBench: wrapper to HtmlRunnerTestLoop.initialize.");
+      this.old_initialize(htmlTestCase, metrics, seleniumCommandFactory);
+      this.commands = [];
+    };
+  }
 
   function evalWithVars(expr) {
     return eval("with (storedVars) {" + expr + "}");
@@ -39,7 +49,42 @@ function $d() { return selenium.browserbot.getDocument(); }
       orig_reset.call(this);
       // called before each: execute a single command / run a testcase / run each testcase in a testsuite
       $$.LOG.debug("In SelBench tail intercept :: selenium.reset()");
-
+      if (globalContext.onServer === true) {
+        function map_list(list, for_func, if_func) {
+          var i,
+          x,
+          mapped_list = [];
+          LOG.info("SelBench: maplist to get commandrows.");
+          for (i = 0; i < list.length; ++i) {
+            x = list[i];
+            // AJS: putaquiupariu
+            if (null == if_func || if_func(i, x)) {
+              mapped_list.push(for_func(i, x));
+            }
+          }
+          return mapped_list;
+        }
+        if (htmlTestRunner == undefined
+           || htmlTestRunner == null) {
+          LOG.info("Selbench: Selenium reset pre htmlTestRunner instatiation ");
+        } else {
+          LOG.info("Selbench: Selenium reset after instatiation of htmlTestRunner.currentTest.htmlTestCase:" + htmlTestRunner.currentTest.htmlTestCase);
+          //TODO: map commands to real types instead of faking it
+          htmlTestRunner.currentTest.commands = map_list(htmlTestRunner.currentTest.htmlTestCase.getCommandRows(), function (i, x) {
+              var b = x.getCommand();
+              if (x.hasOwnProperty('trElement')) {
+                b.type = "command";
+              } else {
+                b.type = "comment";
+              }
+              return b;
+            });
+          // AJS: initializes private testCase (closure) to point to htmlTestRunner.currentTest (public testCase is not available under Core).
+          testCase = htmlTestRunner.currentTest;
+          // the debugContext isn't there, but redirecting to the testCase seems to work.
+          testCase.debugContext = testCase;
+        }
+      }
       try {
         compileSelbenchCommands();
       }
