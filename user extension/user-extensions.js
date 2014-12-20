@@ -151,13 +151,14 @@ var selbench = { name: "SelBench" };
           if (isErrorMatch(e)) {
             // was an expected error
             $$.LOG.debug("Expected error confirmed: " + e.message);
+           //TODO: mark the current command as passed
             isHandled = true;
           }
           else {
             // was an unexpected error
             $$.LOG.error("Expected the error: " + $$.expectedError);
             $$.LOG.error(e.message);
-            isHandled = this.commandError(msg);
+            this._handleCommandError(new Error(e.message));
           }
         }
         finally {
@@ -234,8 +235,8 @@ var globalContext = this;
       orig_reset.call(this);
       // called before each: execute a single command / run a testcase / run each testcase in a testsuite
       $$.LOG.debug("In SelBench tail intercept :: selenium.reset()");
-      if (globalContext.onServer === true && globalContext.scriptInterceptsSeleniumReset !== true) {
-        globalContext.scriptInterceptsSeleniumReset = true;
+      if (globalContext.onServer === true && globalContext.selblocks !== true) {
+        //globalContext.scriptInterceptsSeleniumReset = true;
         function map_list(list, for_func, if_func) {
           var i,
           x,
