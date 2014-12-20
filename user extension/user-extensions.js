@@ -313,7 +313,11 @@ var globalContext = this;
   // ================================================================================
   Selenium.prototype.doExpectError = function(target) {
     $$.expectedError = eval(target);
-    $$.fn.interceptOnce(editor.selDebugger.runner.IDETestLoop.prototype, "resume", $$.handleAsExpectError);
+    if(globalContext.onServer === true) {
+      $$.fn.interceptOnce(HtmlRunnerTestLoop.prototype, "resume", $$.handleAsExpectError);
+    } else {
+      $$.fn.interceptOnce(editor.selDebugger.runner.IDETestLoop.prototype, "resume", $$.handleAsExpectError);
+    }
   };
 
   // ================================================================================
