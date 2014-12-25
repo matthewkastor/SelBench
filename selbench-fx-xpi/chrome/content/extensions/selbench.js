@@ -24,9 +24,6 @@ function $d() { return selenium.browserbot.getDocument(); }
 
 // selbench name-space
 (function($$){
-  function evalWithVars(expr) {
-    return eval("with (storedVars) {" + expr + "}");
-  }
 
   // ================================================================================
   // tail intercept Selenium.reset()
