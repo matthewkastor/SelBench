@@ -4,12 +4,13 @@ maxerr:500,
 plusplus:true
  */
 /*globals
+globalContext,
 selblocks,
 HtmlRunnerTestLoop,
 Selenium,
 htmlTestRunner
  */
-var globalContext = this;
+globalContext = this;
 globalContext.onServer = globalContext.onServer || true;
 globalContext.serverPatchApplied = globalContext.serverPatchApplied || false;
 
