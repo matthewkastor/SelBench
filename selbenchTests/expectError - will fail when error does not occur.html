@@ -4,36 +4,13 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://change-this-to-the-site-you-are-testing/" />
-<title>Colloquial-errors</title>
+<title>expectError - will fail when error does not occur</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">Colloquial</td></tr>
+<tr><td rowspan="1" colspan="3">expectError - will fail when error does not occur</td></tr>
 </thead><tbody>
-<!---- error as expected-->
-<tr>
-	<td>expectError</td>
-	<td>/String\.flubber is not a function/</td>
-	<td></td>
-</tr>
-<tr>
-	<td>getEval</td>
-	<td>String.flubber()</td>
-	<td></td>
-</tr>
-<!--** supposed to fail-->
-<!---- different error than expected-->
-<tr>
-	<td>expectError</td>
-	<td>&quot;String.contains is not a function&quot;</td>
-	<td></td>
-</tr>
-<tr>
-	<td>getEval</td>
-	<td>String.pppphreddddd()</td>
-	<td></td>
-</tr>
 <!--** supposed to fail-->
 <!---- succeed rather than fail-->
 <tr>
@@ -46,6 +23,7 @@
 	<td>&quot;&quot;.trim()</td>
 	<td></td>
 </tr>
+
 </tbody></table>
 </body>
 </html>
