@@ -25,10 +25,6 @@ function $d() { return selenium.browserbot.getDocument(); }
 // selbench name-space
 (function($$){
 
-  function evalWithVars(expr) {
-    return eval("with (storedVars) {" + expr + "}");
-  }
-
   // ================================================================================
   // tail intercept Selenium.reset()
 
@@ -39,7 +35,6 @@ function $d() { return selenium.browserbot.getDocument(); }
       orig_reset.call(this);
       // called before each: execute a single command / run a testcase / run each testcase in a testsuite
       $$.LOG.debug("In SelBench tail intercept :: selenium.reset()");
-
       try {
         compileSelbenchCommands();
       }
@@ -84,7 +79,11 @@ function $d() { return selenium.browserbot.getDocument(); }
   // ================================================================================
   Selenium.prototype.doExpectError = function(target) {
     $$.expectedError = eval(target);
-    $$.fn.interceptOnce(editor.selDebugger.runner.IDETestLoop.prototype, "resume", $$.handleAsExpectError);
+    if(globalContext.onServer === true) {
+      $$.fn.interceptOnce(HtmlRunnerTestLoop.prototype, "resume", $$.handleAsExpectError);
+    } else {
+      $$.fn.interceptOnce(editor.selDebugger.runner.IDETestLoop.prototype, "resume", $$.handleAsExpectError);
+    }
   };
 
   // ================================================================================
