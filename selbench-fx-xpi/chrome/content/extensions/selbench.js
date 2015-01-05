@@ -24,6 +24,14 @@ function $d() { return selenium.browserbot.getDocument(); }
 
 // selbench name-space
 (function($$){
+  if(typeof storedVarsGlobal !== 'object') {
+      // intentional global
+      storedVarsGlobal = storedVars;
+  }
+    
+  function evalWithVars(expr) {
+    return eval("with (storedVars) {" + expr + "}");
+  }
 
   // ================================================================================
   // tail intercept Selenium.reset()
@@ -41,7 +49,7 @@ function $d() { return selenium.browserbot.getDocument(); }
       catch (err) {
         throw new Error("In " + err.fileName + " @" + err.lineNumber + ": " + err);
       }
-      storedVars.emitted = "";
+      storedVarsGlobal.emitted = "";
     };
   })();
 
@@ -71,11 +79,6 @@ function $d() { return selenium.browserbot.getDocument(); }
   // ================================================================================
   // emit execution tracing
 
-  function evalWithVars(expr) {
-    return eval("with (storedVars) {" + expr + "}");
-  }
-
-
   // ================================================================================
   Selenium.prototype.doExpectError = function(target) {
     $$.expectedError = eval(target);
@@ -91,9 +94,9 @@ function $d() { return selenium.browserbot.getDocument(); }
   // appends the given string to current emitted state, (a ~ is inserted between each append)
   Selenium.prototype.doEmit = function(target)
   {
-    if (storedVars.emitted)
-      storedVars.emitted += "~";
-    storedVars.emitted += evalWithVars(target);
+    if (storedVarsGlobal.emitted)
+      storedVarsGlobal.emitted += "~";
+    storedVarsGlobal.emitted += evalWithVars(target);
   };
   // verifies that the accumulated emit state matches the given string
   // if an array is specified, then matches for a ~ between each element
@@ -103,8 +106,8 @@ function $d() { return selenium.browserbot.getDocument(); }
     if (expectedValue instanceof Array) {
       expectedValue = expectedValue.join("~");
     }
-    if (expectedValue != storedVars.emitted) {
-      var errmsg = " expected: " + expectedValue + "\nbut found: " + storedVars.emitted;
+    if (expectedValue != storedVarsGlobal.emitted) {
+      var errmsg = " expected: " + expectedValue + "\nbut found: " + storedVarsGlobal.emitted;
       alert(errmsg);
       throw new Error(errmsg);
     }
@@ -112,7 +115,7 @@ function $d() { return selenium.browserbot.getDocument(); }
   // clears the accumulated emitted state
   Selenium.prototype.doResetEmitted = function()
   {
-    storedVars.emitted = "";
+    storedVarsGlobal.emitted = "";
   };
 
   // ================================================================================
@@ -131,17 +134,19 @@ function $d() { return selenium.browserbot.getDocument(); }
   Selenium.prototype.doAlert = function(expr) {
     alert(evalWithVars(expr));
   };
-
+  
   // remove selenium variable
-  Selenium.prototype.doDeleteVar = function(name) {
-    delete storedVars[name];
+  function deleteVar(name) {
+    delete storedVarsLocal[name];
+    delete storedVarsGlobal[name]
   };
+  Selenium.prototype.doDeleteVar = deleteVar;
 
   // remove selenium variable
   Selenium.prototype.doDeleteVars = function(namesSpec) {
     var names = namesSpec.split(",");
     for (var i = 0; i < names.length; i++) {
-      delete storedVars[names[i].trim()];
+      deleteVar(names[i].trim());
     }
   };
 
@@ -173,7 +178,7 @@ function $d() { return selenium.browserbot.getDocument(); }
   Selenium.prototype.doTimerElapsed = function(name, script)
   {
     if (script) {
-      storedVars._elapsed = timers[name].elapsed();
+      storedVarsGlobal._elapsed = timers[name].elapsed();
       eval(script);
     }
     else
