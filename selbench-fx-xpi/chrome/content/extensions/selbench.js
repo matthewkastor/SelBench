@@ -24,7 +24,11 @@ function $d() { return selenium.browserbot.getDocument(); }
 
 // selbench name-space
 (function($$){
-
+  if(typeof storedVarsGlobal !== 'object') {
+      // intentional global
+      storedVarsGlobal = storedVars;
+  }
+    
   function evalWithVars(expr) {
     return eval("with (storedVars) {" + expr + "}");
   }
