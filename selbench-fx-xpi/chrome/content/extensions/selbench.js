@@ -28,6 +28,10 @@ function $d() { return selenium.browserbot.getDocument(); }
       // intentional global
       storedVarsGlobal = storedVars;
   }
+  if(typeof storedVarsLocal !== 'object') {
+      // intentional global
+      storedVarsLocal = storedVars;
+  }
     
   function evalWithVars(expr) {
     return eval("with (storedVars) {" + expr + "}");
